@@ -1,0 +1,21 @@
+{
+  "name": "oqq/php-file-generator",
+  "type": "library",
+  "require": {
+    "azjezz/psl": "^2.9",
+    "cuyz/valinor": "^1.11",
+    "nette/php-generator": "^4.1",
+    "nikic/php-parser": "^5.0"
+  },
+  "require-dev": {
+    "doctrine/dbal": "^4.0",
+    "doctrine/migrations": "^3.7",
+    "phpunit/phpunit": "^11.0.9"
+  },
+  "autoload": {
+    "psr-4": {
+      "Oqq\\Project\\": "result/",
+      "Oqq\\PhpFileGenerator\\": "src/"
+    }
+  }
+}
