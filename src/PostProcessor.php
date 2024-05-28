@@ -6,8 +6,11 @@ namespace Oqq\PhpFileGenerator;
 
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\Type as NetteType;
 use Nette\PhpGenerator\Type as NettType;
 use Oqq\PhpFileGenerator\Specification\PostProcessorSpecification;
+use Oqq\PhpFileGenerator\Type\ClassStringType;
+use Oqq\PhpFileGenerator\Type\TypeWithValue;
 
 final readonly class PostProcessor
 {
@@ -61,21 +64,26 @@ final readonly class PostProcessor
     }
 
     /**
-     * @param array<non-empty-string, non-empty-string> $constants
+     * @param iterable<non-empty-string, TypeWithValue> $constants
      */
-    private function processClassConstants(PhpNamespace $namespace, ClassType $class, array $constants): void
+    private function processClassConstants(PhpNamespace $namespace, ClassType $class, iterable $constants): void
     {
         if (!$constants) {
             return;
         }
 
-        foreach ($constants as $name => $value) {
-            $constant = $class->hasConstant($name)
-                ? $class->getConstant($name)
-                : $class->addConstant($name, $value);
-
+        foreach ($constants as $name => $type) {
+            $constant = $class->addConstant($name, $type->value, overwrite: true);
             $constant->setPublic();
-            $constant->setType(NettType::String);
+
+            $typeHint = $type->getTypeHint();
+            $constant->setType($typeHint);
+
+            $typeAnnotation = $type->getTypeAnnotation();
+
+            if ($typeAnnotation && $typeAnnotation !== $typeHint) {
+                $constant->setComment('@var ' . $typeAnnotation);
+            }
         }
     }
 }

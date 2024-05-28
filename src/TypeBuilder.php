@@ -28,6 +28,14 @@ final readonly class TypeBuilder
     }
 
     /**
+     * @return Type<class-string>
+     */
+    public static function classString(?string $type): Type
+    {
+        return new Type\ClassStringType($type);
+    }
+
+    /**
      * @template T
      *
      * @param Type<T> $innerType

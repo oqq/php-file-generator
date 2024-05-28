@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oqq\PhpFileGenerator\Specification;
 
 use Oqq\PhpFileGenerator\Specification;
+use Oqq\PhpFileGenerator\Type\TypeWithValue;
 
 /**
  * @template T
@@ -21,8 +22,8 @@ final class PostProcessorSpecification implements Specification
     /** @var list<class-string> */
     public array $implements = [];
 
-    /** @var array<non-empty-string, non-empty-string> */
-    public array $classConstants = [];
+    /** @var iterable<non-empty-string, TypeWithValue> */
+    public iterable $classConstants = [];
 
     public function __construct(
         /** @param class-string<T> $className */
@@ -69,9 +70,9 @@ final class PostProcessorSpecification implements Specification
     }
 
     /**
-     * @param array<non-empty-string, non-empty-string> $constants
+     * @param iterable<non-empty-string, TypeWithValue> $constants
      */
-    public function withConstants(array $constants): self
+    public function withConstants(iterable $constants): self
     {
         $clone = clone $this;
         $clone->classConstants = $constants;

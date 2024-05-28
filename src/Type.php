@@ -9,6 +9,8 @@ namespace Oqq\PhpFileGenerator;
  */
 interface Type
 {
+    public function isOptional(): bool;
+
     /** @return non-empty-string */
     public function getTypeHint(): string;
 

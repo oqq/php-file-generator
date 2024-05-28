@@ -11,13 +11,13 @@ use ArrayObject;
 final readonly class ConfigArrayBody implements CreateMethodBody
 {
     public function __construct(
-        private array $value,
+        private ArrayObject $value,
     ) {
     }
 
     public function __invoke(Method $method): void
     {
-        $method->setBody('return ?;', [$this->value]);
+        $method->setBody('return ?;', [$this->value->getArrayCopy()]);
     }
 
     public function hash(): string

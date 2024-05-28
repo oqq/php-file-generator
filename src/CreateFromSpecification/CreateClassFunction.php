@@ -98,7 +98,7 @@ final readonly class CreateClassFunction implements CreateFromSpecification
         };
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {
-            $parameter->setComment('@var ' . $typeAnnotation);
+            $parameter->setComment('@param ' . $typeAnnotation . ' ' . $parameter->getName());
         }
     }
 
