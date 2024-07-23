@@ -6,10 +6,19 @@ namespace Oqq\PhpFileGenerator;
 
 final readonly class Generator
 {
+    private const DEFAULT_CREATORS = [
+        Specification\ValueObjectSpecification::class => CreateFromSpecification\CreateValueObject::class,
+        Specification\EnumSpecification::class => CreateFromSpecification\CreateEnum::class,
+        Specification\ClassFunctionSpecification::class => CreateFromSpecification\CreateClassFunction::class,
+        Specification\UnitTestSpecification::class => CreateFromSpecification\CreateUnitTest::class,
+    ];
+
     public function __construct(
         private FileStorage $fileStorage,
         private Specifications $specifications,
         private string $cacheFile,
+        /** @var array<class-string<Specification>, CreateFromSpecification> */
+        private array $creators = [],
     ) {
     }
 
@@ -18,12 +27,8 @@ final readonly class Generator
         $cacheContent = \is_file($this->cacheFile) ? \file_get_contents($this->cacheFile) : '{}';
         $cache = \json_decode($cacheContent, associative: true, flags: \JSON_THROW_ON_ERROR);
 
-        $creators = [
-            Specification\ValueObjectSpecification::class => new CreateFromSpecification\CreateValueObject(),
-            Specification\EnumSpecification::class => new CreateFromSpecification\CreateEnum(),
-            Specification\ClassFunctionSpecification::class => new CreateFromSpecification\CreateClassFunction(),
-            Specification\UnitTestSpecification::class => new CreateFromSpecification\CreateUnitTest(),
-        ];
+        $creators = \array_map(static fn (string $createFromSpecification): CreateFromSpecification => new $createFromSpecification(), self::DEFAULT_CREATORS);
+        $creators += $this->creators;
 
         /** @var array<class-string, ClassFile> $classFiles */
         $classFiles = [];

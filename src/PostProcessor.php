@@ -10,7 +10,7 @@ use Nette\PhpGenerator\Type as NetteType;
 use Nette\PhpGenerator\Type as NettType;
 use Oqq\PhpFileGenerator\Specification\PostProcessorSpecification;
 use Oqq\PhpFileGenerator\Type\ClassStringType;
-use Oqq\PhpFileGenerator\Type\TypeWithValue;
+use Oqq\PhpFileGenerator\Type\TypeWithDefaultValue;
 
 final readonly class PostProcessor
 {
@@ -19,7 +19,7 @@ final readonly class PostProcessor
         $namespace = $classFile->getNamespace();
         $class = $classFile->getClass();
 
-        $this->processImports($namespace, $class, $specification->imports);
+        $this->processImports($namespace, $specification->imports);
         $this->processClassAnnotations($namespace, $class, $specification->classAnnotations);
         $this->processImplements($namespace, $class, $specification->implements);
         $this->processClassConstants($namespace, $class, $specification->classConstants);
@@ -28,7 +28,7 @@ final readonly class PostProcessor
     /**
      * @param list<class-string> $imports
      */
-    private function processImports(PhpNamespace $namespace, ClassType $class, array $imports): void
+    private function processImports(PhpNamespace $namespace, array $imports): void
     {
         foreach ($imports as $import) {
             $namespace->addUse($import);
@@ -64,7 +64,7 @@ final readonly class PostProcessor
     }
 
     /**
-     * @param iterable<non-empty-string, TypeWithValue> $constants
+     * @param iterable<non-empty-string, TypeWithDefaultValue> $constants
      */
     private function processClassConstants(PhpNamespace $namespace, ClassType $class, iterable $constants): void
     {

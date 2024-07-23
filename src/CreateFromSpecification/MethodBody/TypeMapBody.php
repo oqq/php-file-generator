@@ -42,6 +42,19 @@ final readonly class TypeMapBody implements CreateMethodBody
 
     private function getTypeMap(Type $type): array | string
     {
+
+        if ($type instanceof Type\OptionalType) {
+            $type = $type->inner;
+        }
+
+        if ($type instanceof Type\TypeWithFixedValue) {
+            $type = $type->inner;
+        }
+
+        if ($type instanceof Type\TypeWithDefaultValue) {
+            $type = $type->inner;
+        }
+
         if ($type instanceof Type\NullableType) {
             $type = $type->inner;
         }
@@ -58,7 +71,11 @@ final readonly class TypeMapBody implements CreateMethodBody
         }
 
         if ($type instanceof Type\InstanceOfType) {
-            return $this->getTypeMap($this->getSpecification($type->className)->type);
+            $specification = $this->getSpecification($type->className);
+            
+            if ($specification instanceof ValueObjectSpecification) {
+                return $this->getTypeMap($specification->type);
+            }
         }
 
         return match(\get_class($type)) {

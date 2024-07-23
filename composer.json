@@ -8,9 +8,9 @@
     "nikic/php-parser": "^5.0"
   },
   "require-dev": {
-    "doctrine/dbal": "^4.0",
-    "doctrine/migrations": "^3.7",
-    "phpunit/phpunit": "^11.0.9"
+    "doctrine/dbal": "^4.0.4",
+    "doctrine/migrations": "^3.8",
+    "phpunit/phpunit": "^11.2.8"
   },
   "autoload": {
     "psr-4": {

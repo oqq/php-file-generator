@@ -92,11 +92,27 @@ final readonly class TypeBuilder
     }
 
     /**
+     * @return Type<int>
+     */
+    public static function integer(): Type
+    {
+        return new Type\IntegerType();
+    }
+
+    /**
      * @return Type<non-negative-int>
      */
     public static function natural(): Type
     {
         return new Type\NaturalType();
+    }
+
+    /**
+     * @return Type<positive-int>
+     */
+    public static function positiveInteger(): Type
+    {
+        return new Type\PositiveIntegerType();
     }
 
     /**
@@ -137,6 +153,30 @@ final readonly class TypeBuilder
     public static function arrayKey(): Type
     {
         return new Type\ArrayKeyType();
+    }
+
+    /**
+     * @template T
+     *
+     * @param Type<T> $innerType
+     *
+     * @return Type<T>
+     */
+    public static function withDefaultValue(Type $innerType, mixed $value): Type
+    {
+        return new Type\TypeWithDefaultValue($innerType, $value);
+    }
+
+    /**
+     * @template T
+     *
+     * @param Type<T> $innerType
+     *
+     * @return Type<T>
+     */
+    public static function withFixedValue(Type $innerType, mixed $value): Type
+    {
+        return new Type\TypeWithFixedValue($innerType, $value);
     }
 
     /**

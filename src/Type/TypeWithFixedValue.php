@@ -6,26 +6,26 @@ namespace Oqq\PhpFileGenerator\Type;
 
 use Oqq\PhpFileGenerator\Type;
 
-final readonly class TypeWithValue implements Type
+final readonly class TypeWithFixedValue implements Type
 {
     public function __construct(
-        public Type $innerType,
+        public Type $inner,
         public mixed $value,
     ) {
     }
 
     public function isOptional(): bool
     {
-        return $this->innerType->isOptional();
+        return $this->inner->isOptional();
     }
 
     public function getTypeHint(): string
     {
-        return $this->innerType->getTypeHint();
+        return $this->inner->getTypeHint();
     }
 
     public function getTypeAnnotation(): string
     {
-        return $this->innerType->getTypeAnnotation();
+        return $this->inner->getTypeAnnotation();
     }
 }
