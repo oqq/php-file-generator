@@ -12,7 +12,7 @@ final class GlobSpecifications implements Specifications
     /** @var array<class-string, Specification> */
     private array $specifications = [];
 
-    /** @var array<class-string, PostProcessorSpecification> */
+    /** @var list<PostProcessorSpecification> */
     private array $postProcessorSpecifications = [];
 
     public static function fromGlobPattern(string $pattern): self
@@ -63,6 +63,15 @@ final class GlobSpecifications implements Specifications
     public function getPostProcessorSpecifications(): iterable
     {
         yield from $this->postProcessorSpecifications;
+    }
+
+    public function getPostProcessorSpecificationsFor(string $className): iterable
+    {
+        foreach ($this->postProcessorSpecifications as $specification) {
+            if ($specification->className === $className) {
+                yield $specification;
+            }
+        }
     }
 
     public function getIterator(): Traversable

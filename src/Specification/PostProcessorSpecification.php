@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oqq\PhpFileGenerator\Specification;
 
+use Oqq\PhpFileGenerator\CreateFromSpecification\CreateMethodBody;
 use Oqq\PhpFileGenerator\Specification;
 use Oqq\PhpFileGenerator\Type\TypeWithDefaultValue;
 
@@ -24,6 +25,12 @@ final class PostProcessorSpecification implements Specification
 
     /** @var iterable<non-empty-string, TypeWithDefaultValue> */
     public iterable $classConstants = [];
+
+    /** @var iterable<non-empty-string, Type> */
+    public iterable $classProperties = [];
+
+    /** @var iterable<non-empty-string, CreateMethodBody> */
+    public iterable $classMethods = [];
 
     public function __construct(
         /** @param class-string<T> $className */
@@ -76,6 +83,28 @@ final class PostProcessorSpecification implements Specification
     {
         $clone = clone $this;
         $clone->classConstants = $constants;
+
+        return $clone;
+    }
+
+    /**
+     * @param iterable<non-empty-string, Type> $properties
+     */
+    public function withProperties(iterable $properties): self
+    {
+        $clone = clone $this;
+        $clone->classProperties = $properties;
+
+        return $clone;
+    }
+
+    /**
+     * @param iterable<non-empty-string, CreateMethodBody> $methods
+     */
+    public function withMethods(iterable $methods): self
+    {
+        $clone = clone $this;
+        $clone->classMethods = $methods;
 
         return $clone;
     }

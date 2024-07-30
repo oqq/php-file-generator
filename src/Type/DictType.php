@@ -19,8 +19,8 @@ final readonly class DictType implements Type
      * @param Type<Tv> $valueType
      */
     public function __construct(
-        private Type $keyType,
-        private Type $valueType
+        public Type $keyType,
+        public Type $valueType,
     ) {
     }
 

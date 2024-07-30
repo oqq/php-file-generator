@@ -25,7 +25,14 @@ interface Specifications extends IteratorAggregate
     public function getSpecificationFor(string $className): Specification;
 
     /**
-     * @return iterable<class-string, PostProcessorSpecification>
+     * @return iterable<array-key, PostProcessorSpecification>
      */
     public function getPostProcessorSpecifications(): iterable;
+
+    /**
+     * @template T
+     * @param class-string<T> $className
+     * @return iterable<array-key, PostProcessorSpecification<T>>
+     */
+    public function getPostProcessorSpecificationsFor(string $className): iterable;
 }

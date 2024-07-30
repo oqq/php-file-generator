@@ -8,9 +8,11 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Type as NetteType;
 use Nette\PhpGenerator\Type as NettType;
+use Oqq\PhpFileGenerator\CreateFromSpecification\CreateMethodBody;
 use Oqq\PhpFileGenerator\Specification\PostProcessorSpecification;
 use Oqq\PhpFileGenerator\Type\ClassStringType;
 use Oqq\PhpFileGenerator\Type\TypeWithDefaultValue;
+use Oqq\PhpFileGenerator\Type\TypeWithFixedValue;
 
 final readonly class PostProcessor
 {
@@ -23,6 +25,8 @@ final readonly class PostProcessor
         $this->processClassAnnotations($namespace, $class, $specification->classAnnotations);
         $this->processImplements($namespace, $class, $specification->implements);
         $this->processClassConstants($namespace, $class, $specification->classConstants);
+        $this->processClassProperties($namespace, $class, $specification->classProperties);
+        $this->processClassMethods($namespace, $class, $specification->classMethods);
     }
 
     /**
@@ -84,6 +88,49 @@ final readonly class PostProcessor
             if ($typeAnnotation && $typeAnnotation !== $typeHint) {
                 $constant->setComment('@var ' . $typeAnnotation);
             }
+        }
+    }
+
+    /**
+     * @param iterable<non-empty-string, Type> $properties
+     */
+    private function processClassProperties(PhpNamespace $namespace, ClassType $class, iterable $properties): void
+    {
+        if (!$properties) {
+            return;
+        }
+
+        foreach ($properties as $name => $type) {
+            $value = $type instanceof TypeWithDefaultValue || $type instanceof TypeWithFixedValue
+                ? $type->value
+                : null;
+
+            $property = $class->addProperty($name, $value, overwrite: true);
+            $property->setPrivate();
+
+            $typeHint = $type->getTypeHint();
+            $property->setType($typeHint);
+
+            $typeAnnotation = $type->getTypeAnnotation();
+
+            if ($typeAnnotation && $typeAnnotation !== $typeHint) {
+                $property->setComment('@var ' . $typeAnnotation);
+            }
+        }
+    }
+
+    /**
+     * @param iterable<non-empty-string, CreateMethodBody> $methods
+     */
+    private function processClassMethods(PhpNamespace $namespace, ClassType $class, iterable $methods): void
+    {
+        if (!$methods) {
+            return;
+        }
+
+        foreach ($methods as $name => $createBody) {
+            $method = $class->addMethod($name, overwrite: true);
+            $createBody($method);
         }
     }
 }
