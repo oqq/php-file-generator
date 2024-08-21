@@ -83,4 +83,23 @@ final class ClassFile
     {
         $this->getNamespace()->addUse($fullClassName);
     }
+
+    public function addImportForType(Type $type): void
+    {
+        if ($type instanceof Type\TypeWithDefaultValue) {
+            $type = $type->inner;
+        }
+
+        if ($type instanceof Type\NullableType) {
+            $type = $type->inner;
+        }
+
+        if ($type instanceof Type\ListType) {
+            $type = $type->valueType;
+        }
+
+        if ($type instanceof Type\InstanceOfType) {
+            $this->addImport($type->className);
+        }
+    }
 }

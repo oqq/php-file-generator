@@ -14,7 +14,7 @@ final readonly class TypeBuilder
      *
      * @return Type<array<Tk, Tv>>
      */
-    public static function shape(array $elements): Type
+    public static function shape(array $elements): Type\ShapeType
     {
         return new Type\ShapeType($elements);
     }
@@ -45,6 +45,14 @@ final readonly class TypeBuilder
     public static function nullable(Type $innerType): Type
     {
         return new Type\NullableType($innerType);
+    }
+
+    /**
+     * @return Type<array>
+     */
+    public static function array(): Type
+    {
+        return new Type\ArrayType();
     }
 
     /**
@@ -142,7 +150,7 @@ final readonly class TypeBuilder
     /**
      * @return Type<iterable<Type>, Type>
      */
-    public static function iterable(Type $keyType, Type $valueType): Type
+    public static function iterable(?Type $keyType, Type $valueType): Type
     {
         return new Type\IterableType($keyType, $valueType);
     }

@@ -13,6 +13,22 @@ final readonly class Name
         return \lcfirst(\str_replace([' ', '_', '-'], '', \ucwords($name, ' _-')));
     }
 
+    public static function snakeCaseName(string $name): string
+    {
+        return \strtolower(\preg_replace('/[A-Z]/', '_$0', \lcfirst($name)));
+    }
+
+    /**
+     * @param class-string $fqcn
+     * @return non-empty-string
+     */
+    public static function className(string $fullClassName): string
+    {
+        $parts = \explode('\\', $fullClassName);
+
+        return \array_pop($parts);
+    }
+
     public static function sortMethods(Method $left, Method $right): int
     {
         $top = ['__construct', 'setUp'];

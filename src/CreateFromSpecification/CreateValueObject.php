@@ -39,41 +39,36 @@ final readonly class CreateValueObject implements CreateFromSpecification
         $type = $specification->type;
 
         if (false === $type instanceof Type\ShapeType) {
-            $this->addParameter($namespace, $method, 'value', $type);
+            $this->addParameter($classFile, $method, 'value', $type);
             return;
         }
 
         foreach ($type->elements as $elementName => $elementType) {
+            $classFile->addImportForType($elementType);
+
             $parameterName = Name::camelCaseName($elementName);
 
             if ($elementType instanceof Type\TypeWithFixedValue) {
-                $this->addProperty($namespace, $class, $method, $parameterName, $elementType);
+                $this->addProperty($classFile, $method, $parameterName, $elementType);
                 continue;
             }
 
-            $this->addParameter($namespace, $method, $parameterName, $elementType);
+            if ($elementType->isOptional()) {
+                $this->addLazyProperty($classFile, $parameterName, $elementType);
+                continue;
+            }
+
+            $this->addParameter($classFile, $method, $parameterName, $elementType);
         }
     }
 
-    private function addParameter(PhpNamespace $namespace, Method $method, string $parameterName, Type $type): void
+    private function addParameter(ClassFile $classFile, Method $method, string $parameterName, Type $type): void
     {
         $parameter = $method->addPromotedParameter($parameterName);
 
         if ($type instanceof Type\TypeWithDefaultValue) {
             $parameter->setDefaultValue($type->value);
             $type = $type->inner;
-        }
-
-        if ($type instanceof Type\InstanceOfType) {
-            $namespace->addUse($type->className);
-        }
-
-        if ($type instanceof Type\NullableType && $type->inner instanceof Type\InstanceOfType) {
-            $namespace->addUse($type->inner->className);
-        }
-
-        if ($type instanceof Type\ListType && $type->valueType instanceof Type\InstanceOfType) {
-            $namespace->addUse($type->valueType->className);
         }
 
         $typeHint = $type->getTypeHint();
@@ -86,7 +81,7 @@ final readonly class CreateValueObject implements CreateFromSpecification
         $typeAnnotation = $type->getTypeAnnotation();
 
         if ($type instanceof Type\ListType && $type->valueType instanceof Type\InstanceOfType) {
-            $typeAnnotation = $namespace->simplifyType($type->getTypeAnnotation());
+            $typeAnnotation = $classFile->getNamespace()->simplifyType($type->getTypeAnnotation());
         }
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {
@@ -94,26 +89,15 @@ final readonly class CreateValueObject implements CreateFromSpecification
         }
     }
 
-    private function addProperty(PhpNamespace $namespace, ClassType $class, Method $method, string $propertyName, Type\TypeWithFixedValue $type): void
+    private function addProperty(ClassFile $classFile, Method $method, string $propertyName, Type\TypeWithFixedValue $type): void
     {
-        $method->addBody('$this->? = ?;', [$propertyName, $type->value]);
-
+        $class = $classFile->getClass();
         $class->removeProperty($propertyName);
+
+        $method->addBody('$this->? = ?;', [$propertyName, $type->value]);
 
         $property = $class->addProperty($propertyName);
         $innerType = $type->inner;
-
-        if ($innerType instanceof Type\InstanceOfType) {
-            $namespace->addUse($innerType->className);
-        }
-
-        if ($innerType instanceof Type\NullableType && $innerType->inner instanceof Type\InstanceOfType) {
-            $namespace->addUse($innerType->inner->className);
-        }
-
-        if ($innerType instanceof Type\ListType && $innerType->valueType instanceof Type\InstanceOfType) {
-            $namespace->addUse($innerType->valueType->className);
-        }
 
         $typeHint = $innerType->getTypeHint();
         $property->setType($typeHint);
@@ -125,7 +109,33 @@ final readonly class CreateValueObject implements CreateFromSpecification
         $typeAnnotation = $innerType->getTypeAnnotation();
 
         if ($innerType instanceof Type\ListType && $innerType->valueType instanceof Type\InstanceOfType) {
-            $typeAnnotation = $namespace->simplifyType($innerType->getTypeAnnotation());
+            $typeAnnotation = $classFile->getNamespace()->simplifyType($innerType->getTypeAnnotation());
+        }
+
+        if ($typeAnnotation && $typeAnnotation !== $typeHint) {
+            $property->setComment('@var ' . $typeAnnotation);
+        }
+    }
+
+    private function addLazyProperty(ClassFile $classFile, string $propertyName, Type $type): void
+    {
+        $class = $classFile->getClass();
+        $class->removeProperty($propertyName);
+
+        $property = $class->addProperty($propertyName);
+        $innerType = $type->inner;
+
+        $typeHint = $innerType->getTypeHint();
+        $property->setType($typeHint);
+
+        if ($innerType->isOptional()) {
+            $property->setNullable();
+        }
+
+        $typeAnnotation = $innerType->getTypeAnnotation();
+
+        if ($innerType instanceof Type\ListType && $innerType->valueType instanceof Type\InstanceOfType) {
+            $typeAnnotation = $classFile->getNamespace()->simplifyType($innerType->getTypeAnnotation());
         }
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {

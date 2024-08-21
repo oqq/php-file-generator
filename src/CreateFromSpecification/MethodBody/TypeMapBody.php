@@ -59,6 +59,13 @@ final readonly class TypeMapBody implements CreateMethodBody
             $type = $type->inner;
         }
 
+        if ($type instanceof Type\DictType) {
+            return [
+                $this->getTypeMap($type->keyType) =>
+                $this->getTypeMap($type->valueType),
+            ];
+        }
+
         if ($type instanceof Type\ShapeType) {
             return $this->getRecursiveTypeMap($type);
         }
@@ -80,9 +87,11 @@ final readonly class TypeMapBody implements CreateMethodBody
 
         return match(\get_class($type)) {
             default => 'word',
-            Type\NaturalType::class => 'randomNumber',
-            Type\UuidType::class => 'uuid',
             Type\BooleanType::class => 'boolean',
+            Type\IntegerType::class,
+            Type\NaturalType::class,
+            Type\PositiveIntegerType::class => 'randomNumber',
+            Type\UuidType::class => 'uuid',
         };
     }
 

@@ -15,12 +15,12 @@ use Oqq\PhpFileGenerator\Type;
 final readonly class IterableType implements Type
 {
     /**
-     * @param Type<Tk> $keyType
+     * @param ?Type<Tk> $keyType
      * @param Type<Tv> $valueType
      */
     public function __construct(
-        private Type $keyType,
-        private Type $valueType
+        private ?Type $keyType,
+        private Type $valueType,
     ) {
     }
 
@@ -36,6 +36,10 @@ final readonly class IterableType implements Type
 
     public function getTypeAnnotation(): string
     {
+        if (null === $this->keyType) {
+            return 'iterable<' . $this->valueType->getTypeAnnotation() . '>';
+        }
+
         return 'iterable<' . $this->keyType->getTypeAnnotation() . ', ' . $this->valueType->getTypeAnnotation() . '>';
     }
 }
