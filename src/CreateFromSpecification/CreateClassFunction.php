@@ -60,8 +60,6 @@ final readonly class CreateClassFunction implements CreateFromSpecification
 
     private function createInvokeMethod(PhpNamespace $namespace, ClassType $class, ClassFunctionSpecification $specification): void
     {
-        $class->removeMethod('__invoke');
-
         if (! $specification->parameters && ! $specification->returnType && ! $specification->methodBody) {
             return;
         }
