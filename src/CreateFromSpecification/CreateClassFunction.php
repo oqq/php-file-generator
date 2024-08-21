@@ -66,7 +66,10 @@ final readonly class CreateClassFunction implements CreateFromSpecification
             return;
         }
 
-        $method = $class->addMethod('__invoke');
+        $method = $class->hasMethod('__invoke')
+            ? $class->getMethod('__invoke')
+            : $class->addMethod('__invoke');
+
         $method->setPublic();
 
         $this->setReturnType($method, $specification->returnType);
@@ -79,6 +82,7 @@ final readonly class CreateClassFunction implements CreateFromSpecification
         }
 
         if ($specification->methodBody) {
+            $method->setBody('');
             ($specification->methodBody)($method);
         }
     }
