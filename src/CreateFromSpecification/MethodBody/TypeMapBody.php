@@ -92,6 +92,7 @@ final readonly class TypeMapBody implements CreateMethodBody
             Type\NaturalType::class,
             Type\PositiveIntegerType::class => 'randomNumber',
             Type\UuidType::class => 'uuid',
+            Type\DateTimeType::class => ['date', 'Y-m-d\TH:i:s.uP'],
         };
     }
 

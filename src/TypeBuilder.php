@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Oqq\PhpFileGenerator;
 
+use DateTimeImmutable;
+
 final readonly class TypeBuilder
 {
     /**
@@ -193,5 +195,13 @@ final readonly class TypeBuilder
     public static function mixed(): Type
     {
         return new Type\MixedType();
+    }
+
+    /**
+     * @return Type<DateTimeImmutable>
+     */
+    public static function dateTime(): Type
+    {
+        return new Type\DateTimeType();
     }
 }
