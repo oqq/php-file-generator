@@ -198,6 +198,26 @@ final readonly class TypeBuilder
     }
 
     /**
+     * @template T
+     *
+     * @param Type<T> $firstType
+     * @param Type<T> $secondType
+     * @param Type<T> ...$rest
+     *
+     * @return Type<T>
+     */
+    public static function union(Type $firstType, Type $secondType, Type ...$rest): Type
+    {
+        $unionType = new Type\UnionType($firstType, $secondType);
+
+        foreach ($rest as $type) {
+            $unionType = new Type\UnionType($unionType, $type);
+        }
+
+        return $unionType;
+    }
+
+    /**
      * @return Type<DateTimeImmutable>
      */
     public static function dateTime(): Type
