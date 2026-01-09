@@ -23,6 +23,7 @@ final readonly class ClassFunctionSpecification implements Specification
         public array $parameters,
         public ?Type $returnType = null,
         public ?CreateMethodBody $methodBody = null,
+        public ?CreateMethodBody $initialMethodBody = null,
     ) {
     }
 
@@ -34,6 +35,7 @@ final readonly class ClassFunctionSpecification implements Specification
         $values[] = \serialize($this->parameters);
         $values[] = \serialize($this->returnType?->getTypeAnnotation());
         $values[] = \serialize($this->methodBody?->hash());
+        $values[] = \serialize($this->initialMethodBody?->hash());
 
         return \md5(\implode('.', $values));
     }

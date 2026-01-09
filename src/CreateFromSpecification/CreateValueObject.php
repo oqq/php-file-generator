@@ -78,11 +78,7 @@ final readonly class CreateValueObject implements CreateFromSpecification
             $parameter->setNullable();
         }
 
-        $typeAnnotation = $type->getTypeAnnotation();
-
-        if ($type instanceof Type\ListType && $type->valueType instanceof Type\InstanceOfType) {
-            $typeAnnotation = $classFile->getNamespace()->simplifyType($type->getTypeAnnotation());
-        }
+        $typeAnnotation = $classFile->simplifyTypeAnnotation($type);
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {
             $parameter->setComment('@var ' . $typeAnnotation);
@@ -106,11 +102,7 @@ final readonly class CreateValueObject implements CreateFromSpecification
             $property->setNullable();
         }
 
-        $typeAnnotation = $innerType->getTypeAnnotation();
-
-        if ($innerType instanceof Type\ListType && $innerType->valueType instanceof Type\InstanceOfType) {
-            $typeAnnotation = $classFile->getNamespace()->simplifyType($innerType->getTypeAnnotation());
-        }
+        $typeAnnotation = $classFile->simplifyTypeAnnotation($innerType);
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {
             $property->setComment('@var ' . $typeAnnotation);
@@ -132,11 +124,7 @@ final readonly class CreateValueObject implements CreateFromSpecification
             $property->setNullable();
         }
 
-        $typeAnnotation = $innerType->getTypeAnnotation();
-
-        if ($innerType instanceof Type\ListType && $innerType->valueType instanceof Type\InstanceOfType) {
-            $typeAnnotation = $classFile->getNamespace()->simplifyType($innerType->getTypeAnnotation());
-        }
+        $typeAnnotation = $classFile->simplifyTypeAnnotation($innerType);
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {
             $property->setComment('@var ' . $typeAnnotation);

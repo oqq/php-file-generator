@@ -42,7 +42,6 @@ final readonly class TypeMapBody implements CreateMethodBody
 
     private function getTypeMap(Type $type): array | string
     {
-
         if ($type instanceof Type\OptionalType) {
             $type = $type->inner;
         }
@@ -87,6 +86,7 @@ final readonly class TypeMapBody implements CreateMethodBody
 
         return match(\get_class($type)) {
             default => 'word',
+            Type\ArrayType::class => [],
             Type\BooleanType::class => 'boolean',
             Type\IntegerType::class,
             Type\NaturalType::class,

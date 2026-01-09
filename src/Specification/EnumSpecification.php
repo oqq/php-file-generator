@@ -15,7 +15,7 @@ final readonly class EnumSpecification implements Specification
     public function __construct(
         /** @var class-string<T> */
         public string $className,
-        /** @var list<string> */
+        /** @var list<non-empty-string> */
         public array $cases,
     ) {
     }

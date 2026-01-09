@@ -70,13 +70,17 @@ final readonly class CreateClassFunction implements CreateFromSpecification
 
         $method->setPublic();
 
-        $this->setReturnType($method, $specification->returnType);
+        $this->setReturnType($namespace, $method, $specification->returnType);
 
         foreach ($specification->parameters as $parameterName => $parameterType) {
             $parameterName = Name::camelCaseName($parameterName);
             $parameter = $method->addParameter($parameterName);
 
             $this->configureParameter($namespace, $parameter, $parameterType);
+        }
+
+        if ($specification->initialMethodBody && $method->getBody() === '') {
+            ($specification->initialMethodBody)($method);
         }
 
         if ($specification->methodBody) {
@@ -87,9 +91,7 @@ final readonly class CreateClassFunction implements CreateFromSpecification
 
     private function configureParameter(PhpNamespace $namespace, Parameter $parameter, Type $type): void
     {
-        if ($type instanceof Type\InstanceOfType) {
-            $namespace->addUse($type->className);
-        }
+        $this->requireType($namespace, $type);
 
         $typeHint = $type->getTypeHint();
         $parameter->setType($typeHint);
@@ -104,8 +106,10 @@ final readonly class CreateClassFunction implements CreateFromSpecification
         }
     }
 
-    private function setReturnType(Method $method, ?Type $returnType): void
+    private function setReturnType(PhpNamespace $namespace, Method $method, ?Type $returnType): void
     {
+        $this->requireType($namespace, $returnType);
+
         if (null === $returnType) {
             $method->setReturnType(NetteType::Void);
             return;
@@ -117,7 +121,26 @@ final readonly class CreateClassFunction implements CreateFromSpecification
         $method->setReturnType($typeHint);
 
         if ($typeAnnotation && $typeAnnotation !== $typeHint) {
-            $method->setComment('@return ' . $typeAnnotation);
+            $method->setComment('@return ' . $namespace->simplifyType($typeAnnotation));
+        }
+    }
+
+    private function requireType(PhpNamespace $namespace, ?Type $type): void
+    {
+        if (null === $type) {
+            return;
+        }
+
+        if ($type instanceof Type\NullableType) {
+            $type = $type->inner;
+        }
+
+        if ($type instanceof Type\IterableType) {
+            $type = $type->valueType;
+        }
+
+        if ($type instanceof Type\InstanceOfType) {
+            $namespace->addUse($type->className);
         }
     }
 }

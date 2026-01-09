@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Oqq\PhpFileGenerator\Test;
+
 use Nette\PhpGenerator\PsrPrinter;
 use Oqq\PhpFileGenerator\ClassFile;
 use Oqq\PhpFileGenerator\CreateFromSpecification\CreateValueObject;
@@ -12,9 +14,12 @@ use Oqq\PhpFileGenerator\Type\ListType;
 use Oqq\PhpFileGenerator\Type\NonEmptyStringType;
 use Oqq\PhpFileGenerator\Type\NullableType;
 use Oqq\PhpFileGenerator\Type\ShapeType;
+use Oqq\PhpFileGenerator\Type\UnionType;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(UnionType::class)]
 final class ValueObjectTest extends TestCase
 {
     private CreateValueObject $creator;

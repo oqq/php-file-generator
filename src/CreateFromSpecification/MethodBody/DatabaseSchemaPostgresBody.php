@@ -84,7 +84,7 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
                     }
 
                     throw new \RuntimeException(
-                        \sprintf('Mismatching element type, %s != %s', $elements[$name]::class, $elementType::class)
+                        \sprintf('Mismatching element type for %s, %s != %s', $name, $elements[$name]::class, $elementType::class)
                     );
                 }
 
@@ -124,8 +124,14 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
         return match ($type::class) {
             Type\UuidType::class => [new Literal('Types::GUID'), [...$options]],
             Type\BooleanType::class => [new Literal('Types::BOOLEAN'), [...$options]],
+            Type\ArrayType::class,
+            Type\DictType::class,
             Type\ShapeType::class => [new Literal('Types::JSON'), ['default' => '{}', ...$options]],
             Type\ListType::class => [new Literal('Types::JSON'), ['default' => '[]', ...$options]],
+            Type\IntegerType::class,
+            Type\NaturalType::class,
+            Type\PositiveIntegerType::class => [new Literal('Types::INTEGER'), [...$options]],
+            Type\InstanceOfType::class => [new Literal('Types::JSON'), [...$options]],
             default => [new Literal('Types::STRING'), [...$options]],
         };
     }

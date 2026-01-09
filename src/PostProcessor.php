@@ -18,63 +18,74 @@ final readonly class PostProcessor
 {
     public function __invoke(ClassFile $classFile, PostProcessorSpecification $specification): void
     {
-        $namespace = $classFile->getNamespace();
-        $class = $classFile->getClass();
+        $this->importTypes($classFile, $specification->classConstants);
+        $this->processImports($classFile, $specification->implements);
 
-        $this->processImports($namespace, $specification->imports);
-        $this->processClassAnnotations($namespace, $class, $specification->classAnnotations);
-        $this->processImplements($namespace, $class, $specification->implements);
-        $this->processClassConstants($namespace, $class, $specification->classConstants);
-        $this->processClassProperties($namespace, $class, $specification->classProperties);
-        $this->processClassMethods($namespace, $class, $specification->classMethods);
+        $this->processImports($classFile, $specification->imports);
+        $this->processClassAnnotations($classFile, $specification->classAnnotations);
+        $this->processImplements($classFile, $specification->implements);
+        $this->processClassConstants($classFile, $specification->classConstants);
+        $this->processClassProperties($classFile, $specification->classProperties);
+        $this->processClassMethods($classFile, $specification->classMethods);
+    }
+
+    /**
+     * @param iterable<Type> $types
+     * @return void
+     */
+    private function importTypes(ClassFile $classFile, iterable $types)
+    {
+        foreach ($types as $type) {
+            $classFile->addImportForType($type);
+        }
     }
 
     /**
      * @param list<class-string> $imports
      */
-    private function processImports(PhpNamespace $namespace, array $imports): void
+    private function processImports(ClassFile $classFile, array $imports): void
     {
         foreach ($imports as $import) {
-            $namespace->addUse($import);
+            $classFile->addImport($import);
         }
     }
 
     /**
      * @param list<non-empty-string> $classAnnotations
      */
-    private function processClassAnnotations(PhpNamespace $namespace, ClassType $class, array $classAnnotations): void
+    private function processClassAnnotations(ClassFile $classFile, array $classAnnotations): void
     {
+        $class = $classFile->getClass();
         $class->setComment(null);
 
         foreach ($classAnnotations as $classAnnotation) {
-            $class->addComment($namespace->simplifyType($classAnnotation));
+            $class->addComment($classFile->getNamespace()->simplifyType($classAnnotation));
         }
     }
 
     /**
      * @param list<non-empty-string> $implements
      */
-    private function processImplements(PhpNamespace $namespace, ClassType $class, array $implements): void
+    private function processImplements(ClassFile $classFile, array $implements): void
     {
         if (!$implements) {
             return;
         }
 
-        foreach ($implements as $implement) {
-            $namespace->addUse($implement);
-        }
-
+        $class = $classFile->getClass();
         $class->setImplements($implements);
     }
 
     /**
      * @param iterable<non-empty-string, TypeWithDefaultValue> $constants
      */
-    private function processClassConstants(PhpNamespace $namespace, ClassType $class, iterable $constants): void
+    private function processClassConstants(ClassFile $classFile, iterable $constants): void
     {
         if (!$constants) {
             return;
         }
+
+        $class = $classFile->getClass();
 
         foreach ($constants as $name => $type) {
             $constant = $class->addConstant($name, $type->value, overwrite: true);
@@ -94,11 +105,13 @@ final readonly class PostProcessor
     /**
      * @param iterable<non-empty-string, Type> $properties
      */
-    private function processClassProperties(PhpNamespace $namespace, ClassType $class, iterable $properties): void
+    private function processClassProperties(ClassFile $classFile, iterable $properties): void
     {
         if (!$properties) {
             return;
         }
+
+        $class = $classFile->getClass();
 
         foreach ($properties as $name => $type) {
             $value = $type instanceof TypeWithDefaultValue || $type instanceof TypeWithFixedValue
@@ -122,11 +135,13 @@ final readonly class PostProcessor
     /**
      * @param iterable<non-empty-string, CreateMethodBody> $methods
      */
-    private function processClassMethods(PhpNamespace $namespace, ClassType $class, iterable $methods): void
+    private function processClassMethods(ClassFile $classFile, iterable $methods): void
     {
         if (!$methods) {
             return;
         }
+
+        $class = $classFile->getClass();
 
         foreach ($methods as $name => $createBody) {
             $method = $class->addMethod($name, overwrite: true);

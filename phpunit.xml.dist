@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd"
+         colors="true"
+         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutOutputDuringTests="true"
+         bootstrap="./tests/phpunit.bootstrap.php"
+         failOnRisky="true"
+         failOnWarning="true"
+         executionOrder="random"
+         cacheDirectory="./tests/_cache/phpunit"
+         requireCoverageMetadata="true"
+>
+    <source>
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+    </source>
+    <testsuite name="Gastrobuero\JobControl.unit">
+        <directory>./tests/unit</directory>
+    </testsuite>
+    <coverage>
+        <report>
+            <clover outputFile="tests/_output/coverage.xml"/>
+            <php outputFile="tests/_output/coverage.serialized"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="tests/_output/reports/unit.xml"/>
+    </logging>
+    <php>
+        <ini name="memory_limit" value="-1"/>
+        <env name="TEST_VAR" value="test"/>
+        <env name="TEST_VAR_EMPTY" value=""/>
+    </php>
+</phpunit>

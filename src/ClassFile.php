@@ -79,27 +79,62 @@ final class ClassFile
         return $this->class;
     }
 
-    public function addImport(string $fullClassName): void
+    public function addImport(string $fullClassName, ?string $alias = null): void
     {
-        $this->getNamespace()->addUse($fullClassName);
+        $this->getNamespace()->addUse($fullClassName, $alias);
     }
 
     public function addImportForType(Type $type): void
     {
+        if ($type instanceof Type\InstanceOfType) {
+            $this->addImport($type->className);
+            return;
+        }
+
+        if ($type instanceof Type\ClassStringType && $type->type) {
+            $this->addImport($type->type);
+        }
+
         if ($type instanceof Type\TypeWithDefaultValue) {
-            $type = $type->inner;
+            $this->addImportForType($type->inner);
         }
 
         if ($type instanceof Type\NullableType) {
-            $type = $type->inner;
+            $this->addImportForType($type->inner);
         }
 
         if ($type instanceof Type\ListType) {
-            $type = $type->valueType;
+            $this->addImportForType($type->valueType);
         }
 
-        if ($type instanceof Type\InstanceOfType) {
-            $this->addImport($type->className);
+        if ($type instanceof Type\DictType) {
+            $this->addImportForType($type->keyType);
+            $this->addImportForType($type->valueType);
         }
+    }
+
+    public function simplifyTypeAnnotation(Type $type): string
+    {
+        $valueType = null;
+
+        if ($type instanceof Type\ListType) {
+            $valueType = $type->valueType;
+        }
+
+        if ($type instanceof Type\DictType) {
+            $valueType = $type->valueType;
+        }
+
+        if (false === ($valueType instanceof Type\InstanceOfType)) {
+            return $type->getTypeAnnotation();
+        }
+
+        $annotation = $this->getNamespace()->simplifyType($type->getTypeAnnotation());
+        $annotation = \str_replace('\non-empty-string', 'non-empty-string', $annotation);
+        $annotation = \str_replace('array-\key', 'array-key', $annotation);
+        $annotation = \str_replace('\non-\negative-int', 'non-negative-int', $annotation);
+
+
+        return $annotation;
     }
 }

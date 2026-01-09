@@ -13,9 +13,25 @@ final readonly class Name
         return \lcfirst(\str_replace([' ', '_', '-'], '', \ucwords($name, ' _-')));
     }
 
+    public static function pascalCaseName(string $name): string
+    {
+        return \ucfirst(\str_replace([' ', '_', '-'], '', \ucwords($name, ' _-')));
+    }
+
     public static function snakeCaseName(string $name): string
     {
-        return \strtolower(\preg_replace('/[A-Z]/', '_$0', \lcfirst($name)));
+        $name = self::camelCaseName($name);
+        $name = \preg_replace('/(?<=\\w)(?=[A-Z])|(?<=[a-z])(?=[0-9])/', '_', $name);
+
+        return \strtolower($name);
+    }
+
+    public static function kebabCaseName(string $name): string
+    {
+        $name = self::camelCaseName($name);
+        $name = \preg_replace('/(?<=\\w)(?=[A-Z])|(?<=[a-z])(?=[0-9])/', '-', $name);
+
+        return \strtolower($name);
     }
 
     /**

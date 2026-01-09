@@ -28,7 +28,7 @@ final class GlobSpecifications implements Specifications
             }
 
             if ($specifications->hasSpecificationFor($specification->className)) {
-                throw new \RuntimeException(\sprintf('Duplicate specification for class "%s"', $specification->className));
+                //throw new \RuntimeException(\sprintf('Duplicate specification for class "%s"', $specification->className));
             }
 
             $specifications->specifications[$specification->className] = $specification;

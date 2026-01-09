@@ -27,6 +27,18 @@ final readonly class SpecificationBuilder
      *
      * @return iterable<Specification<T>>
      */
+    public static function valueObjectType(string $className, Type $type): iterable
+    {
+        yield new Specification\ValueObjectTypeSpecification($className, $type);
+    }
+
+    /**
+     * @template T
+     *
+     * @param class-string<T> $className
+     *
+     * @return iterable<Specification<T>>
+     */
     public static function valueObject(string $className, Type $type): iterable
     {
         yield new Specification\ValueObjectSpecification($className, $type);
@@ -74,8 +86,9 @@ final readonly class SpecificationBuilder
         array $parameters = [],
         ?Type $returnType = null,
         ?CreateMethodBody $methodBody = null,
+        ?CreateMethodBody $initialMethodBody = null,
     ): iterable {
-        yield new Specification\ClassFunctionSpecification($className, $dependencies, $parameters, $returnType, $methodBody);
+        yield new Specification\ClassFunctionSpecification($className, $dependencies, $parameters, $returnType, $methodBody, $initialMethodBody);
     }
 
     /**

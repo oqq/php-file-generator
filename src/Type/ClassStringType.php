@@ -15,7 +15,7 @@ final readonly class ClassStringType implements Type
      * @param ?class-string $type
      */
     public function __construct(
-        private ?string $type = null,
+        public ?string $type = null,
     ) {
     }
 

@@ -2,20 +2,33 @@
   "name": "oqq/php-file-generator",
   "type": "library",
   "require": {
-    "azjezz/psl": "^2.9",
-    "cuyz/valinor": "^1.11",
-    "nette/php-generator": "^4.1",
-    "nikic/php-parser": "^5.0"
+    "php": "~8.5",
+    "azjezz/psl": "^4.2",
+    "cuyz/valinor": "^2.3",
+    "nette/php-generator": "^4.2",
+    "nikic/php-parser": "^5.7"
   },
   "require-dev": {
-    "doctrine/dbal": "^4.0.4",
-    "doctrine/migrations": "^3.8",
-    "phpunit/phpunit": "^11.2.8"
+    "doctrine/dbal": "^4.4.1",
+    "doctrine/migrations": "^3.9.5",
+    "phpunit/phpunit": "^12.5.4"
+  },
+  "config": {
+    "sort-packages": true,
+    "bump-after-update": "dev",
+    "audit": {
+      "block-insecure": true
+    }
   },
   "autoload": {
     "psr-4": {
       "Oqq\\Project\\": "result/",
       "Oqq\\PhpFileGenerator\\": "src/"
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Oqq\\PhpFileGenerator\\test\\": "tests/unit"
+      }
     }
   }
 }

@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace Oqq\PhpFileGenerator;
 
 use Nette\PhpGenerator\PhpFile;
-use Nette\PhpGenerator\PsrPrinter;
 
 final readonly class LocalFileStorage implements FileStorage
 {
-    private PsrPrinter $printer;
+    private PerPrinter $printer;
 
     public function __construct(
         /** @var array<string, string> */
         private array $namespaceDirMapping,
     ) {
-        $this->printer = new PsrPrinter();
+        $this->printer = new PerPrinter();
     }
 
     public function getClassFileFromExistingFile(string $fullClassName): ClassFile
@@ -40,7 +39,15 @@ final readonly class LocalFileStorage implements FileStorage
         $file = $classFile->getFile();
         $file->setStrictTypes();
 
-        \file_put_contents($fileKey, $this->printer->printFile($file));
+        $currentFileContent = \is_file($fileKey)
+            ? \file_get_contents($fileKey)
+            : null;
+
+        $newFileContent = $this->printer->printFile($file);
+
+        if ($currentFileContent !== $newFileContent) {
+            \file_put_contents($fileKey, $newFileContent);
+        }
     }
 
     private function getFileKeyForFullClassName(string $fullClassName): string
