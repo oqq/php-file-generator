@@ -152,7 +152,7 @@ final readonly class TypeBuilder
     /**
      * @return Type<iterable<Type>, Type>
      */
-    public static function iterable(?Type $keyType, Type $valueType): Type
+    public static function iterable(?Type $keyType, ?Type $valueType): Type
     {
         return new Type\IterableType($keyType, $valueType);
     }

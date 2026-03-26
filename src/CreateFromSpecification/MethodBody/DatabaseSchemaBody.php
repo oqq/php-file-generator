@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oqq\PhpFileGenerator\CreateFromSpecification\MethodBody;
 
+use Doctrine\DBAL\Types\Types;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Oqq\PhpFileGenerator\CreateFromSpecification\CreateMethodBody;
@@ -23,23 +24,37 @@ final readonly class DatabaseSchemaBody implements CreateMethodBody
 
     public function __invoke(Method $method): void
     {
-        $method->addBody('$schema = new Schema();');
-        $method->addBody('');
-
-        $method->addBody('$table = $schema->createTable(self::TABLE_NAME);');
+        $method->addBody('$tableEditor = Schema\Table::editor();');
+        $method->addBody('$tableEditor->setUnquotedName(self::TABLE_NAME);');
         $method->addBody('');
 
         $columns = $this->matchColumns($this->readModels);
 
         foreach ($columns as $name => [$doctrineType, $doctrineOptions]) {
-            $method->addBody('$table->addColumn(?, ?, ?);', [$name, $doctrineType, $doctrineOptions]);
+            $method->addBody(<<<'PHP'
+                $tableEditor->addColumn(
+                    Schema\Column::editor()
+                        ->setUnquotedName('?')
+                        ->setTypeName(?)
+                        ?
+                        ->create()
+                );
+                PHP
+            , [$name, $doctrineType, $doctrineOptions]);
         }
 
         $method->addBody('');
-        $method->addBody('$table->setPrimaryKey([?]);', [\array_key_first($columns)]);
+        $method->addBody(<<<'PHP'
+            $tableEditor->setPrimaryKeyConstraint(
+                Schema\PrimaryKeyConstraint::editor()
+                ->setUnquotedColumnNames('?')
+                ->create()
+            );
+            PHP
+        , [\array_key_first($columns)]);
 
         $method->addBody('');
-        $method->addBody('return $schema;');
+        $method->addBody('return $tableEditor->create();');
     }
 
     public function hash(): string

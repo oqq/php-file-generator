@@ -6,11 +6,15 @@ namespace Oqq\PhpFileGenerator;
 
 final readonly class Generator
 {
-    private const DEFAULT_CREATORS = [
+    private const array DEFAULT_CREATORS = [
         Specification\ValueObjectSpecification::class => CreateFromSpecification\CreateValueObject::class,
         Specification\EnumSpecification::class => CreateFromSpecification\CreateEnum::class,
         Specification\ClassFunctionSpecification::class => CreateFromSpecification\CreateClassFunction::class,
         Specification\UnitTestSpecification::class => CreateFromSpecification\CreateUnitTest::class,
+    ];
+
+    private const array DEFAULT_POST_PROCESSORS = [
+        Specification\ClassPostProcessorSpecification::class => ClassPostProcessor::class,
     ];
 
     public function __construct(
@@ -19,6 +23,8 @@ final readonly class Generator
         private string $cacheFile,
         /** @var array<class-string<Specification>, CreateFromSpecification> */
         private array $creators = [],
+        /** @var array<class-string<PostProcessorSpecification>, PostProcessFromSpecification> */
+        private array $postProcessors = [],
     ) {
     }
 
@@ -29,6 +35,9 @@ final readonly class Generator
 
         $creators = \array_map(static fn (string $createFromSpecification): CreateFromSpecification => new $createFromSpecification(), self::DEFAULT_CREATORS);
         $creators += $this->creators;
+
+        $postProcessors = \array_map(static fn (string $postProcessFromSpecification): PostProcessFromSpecification => new $postProcessFromSpecification(), self::DEFAULT_POST_PROCESSORS);
+        $postProcessors += $this->postProcessors;
 
         /** @var array<class-string, ClassFile> $classFiles */
         $classFiles = [];
@@ -54,10 +63,10 @@ final readonly class Generator
 
         #\file_put_contents($this->cacheFile, \json_encode($cache, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT));
 
-        $postProcessor = new PostProcessor();
-
         foreach ($this->specifications->getPostProcessorSpecifications() as $specification) {
             $classFiles[$specification->className] ??= $this->fileStorage->getClassFileFromExistingFile($specification->className);
+
+            $postProcessor = $postProcessors[$specification::class];
             $postProcessor($classFiles[$specification->className], $specification);
         }
 

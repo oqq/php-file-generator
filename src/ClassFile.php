@@ -115,17 +115,32 @@ final class ClassFile
 
     public function simplifyTypeAnnotation(Type $type): string
     {
+        $simplifyType = false;
         $valueType = null;
 
+        if ($type instanceof Type\TypeWithDefaultValue) {
+            $type = $type->inner;
+        }
+
+        if ($type instanceof Type\TypeWithFixedValue) {
+            $type = $type->inner;
+        }
+
+        $innerTypes = [];
+
         if ($type instanceof Type\ListType) {
-            $valueType = $type->valueType;
+            $simplifyType = $type->valueType instanceof Type\InstanceOfType
+                || $type->valueType instanceof Type\ClassStringType;
         }
 
         if ($type instanceof Type\DictType) {
-            $valueType = $type->valueType;
+            $simplifyType = $type->valueType instanceof Type\InstanceOfType
+                || $type->valueType instanceof Type\ClassStringType
+                || $type->keyType instanceof Type\InstanceOfType
+                || $type->keyType instanceof Type\ClassStringType;
         }
 
-        if (false === ($valueType instanceof Type\InstanceOfType)) {
+        if (! $simplifyType) {
             return $type->getTypeAnnotation();
         }
 
@@ -133,7 +148,6 @@ final class ClassFile
         $annotation = \str_replace('\non-empty-string', 'non-empty-string', $annotation);
         $annotation = \str_replace('array-\key', 'array-key', $annotation);
         $annotation = \str_replace('\non-\negative-int', 'non-negative-int', $annotation);
-
 
         return $annotation;
     }

@@ -8,6 +8,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\PropertyAccessMode;
 use Nette\PhpGenerator\Type as NetteType;
 use Oqq\PhpFileGenerator\ClassFile;
 use Oqq\PhpFileGenerator\CreateFromSpecification;
@@ -29,6 +30,7 @@ final readonly class CreateValueObject implements CreateFromSpecification
         $class = $classFile->getClass();
         $class->setFinal();
         $class->setReadOnly();
+        $class->setComment('@generated');
 
         $class->removeMethod('__construct');
 
@@ -93,6 +95,8 @@ final readonly class CreateValueObject implements CreateFromSpecification
         $method->addBody('$this->? = ?;', [$propertyName, $type->value]);
 
         $property = $class->addProperty($propertyName);
+        $property->setPrivate(PropertyAccessMode::Set);
+
         $innerType = $type->inner;
 
         $typeHint = $innerType->getTypeHint();

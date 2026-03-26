@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Oqq\PhpFileGenerator\Specification;
 
 use Oqq\PhpFileGenerator\CreateFromSpecification\CreateMethodBody;
+use Oqq\PhpFileGenerator\PostProcessorSpecification;
 use Oqq\PhpFileGenerator\Specification;
+use Oqq\PhpFileGenerator\Type;
 use Oqq\PhpFileGenerator\Type\TypeWithDefaultValue;
 
 /**
  * @template T
  * @implements Specification<T>
  */
-final class PostProcessorSpecification implements Specification
+final class ClassPostProcessorSpecification implements PostProcessorSpecification
 {
     /** @var list<class-string> */
     public array $imports = [];

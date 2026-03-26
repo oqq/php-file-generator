@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Oqq\PhpFileGenerator;
 
+use Goodlive\GoodControl\Domain\AggregateId;
+
 /**
  * @template T of object
- * @property-read class-string<T> $className
  */
 interface Specification
 {
+    /** @var class-string<T> */
+    public string $className { get; }
+
     /**
      * @return non-empty-string
      */

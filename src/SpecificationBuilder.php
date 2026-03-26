@@ -13,11 +13,11 @@ final readonly class SpecificationBuilder
      *
      * @param class-string<T> $className
      *
-     * @return Specification\PostProcessorSpecification<T>
+     * @return Specification\ClassPostProcessorSpecification<T>
      */
-    public static function postProcessor(string $className): Specification\PostProcessorSpecification
+    public static function classPostProcessor(string $className): Specification\ClassPostProcessorSpecification
     {
-        return new Specification\PostProcessorSpecification($className);
+        return new Specification\ClassPostProcessorSpecification($className);
     }
 
     /**
@@ -55,20 +55,6 @@ final readonly class SpecificationBuilder
     public static function enum(string $className, array $cases): iterable
     {
         yield new Specification\EnumSpecification($className, $cases);
-    }
-
-    /**
-     * @template T
-     *
-     * @param class-string<T> $className
-     * @param non-empty-string $tableName
-     * @param list<class-string> $readModels
-     *
-     * @return iterable<Specification<T>>
-     */
-    public static function databaseSchema(string $className, string $tableName, array $readModels): iterable
-    {
-        yield new Specification\DatabaseSchemaSpecification($className, $tableName, $readModels);
     }
 
     /**

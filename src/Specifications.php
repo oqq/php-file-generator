@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Oqq\PhpFileGenerator;
 
 use IteratorAggregate;
-use Oqq\PhpFileGenerator\Specification\PostProcessorSpecification;
+use Oqq\PhpFileGenerator\Specification\ClassPostProcessorSpecification;
 
 /**
  * @extends IteratorAggregate<class-string, Specification>

@@ -23,23 +23,36 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
 
     public function __invoke(Method $method): void
     {
-        $method->addBody('$schema = new Schema();');
-        $method->addBody('');
-
-        $method->addBody('$table = $schema->createTable(self::TABLE_NAME);');
+        $method->addBody('$table = Schema\Table::editor();');
+        $method->addBody('$table->setUnquotedName(self::TABLE_NAME);');
         $method->addBody('');
 
         $columns = $this->matchColumns($this->readModels);
 
         foreach ($columns as $name => [$doctrineType, $doctrineOptions]) {
-            $method->addBody('$table->addColumn(?, ?, ?);', [$name, $doctrineType, $doctrineOptions]);
+            $method->addBody('$column = Schema\Column::editor();');
+            $method->addBody('$column->setUnquotedName(?);', [$name]);
+            $method->addBody('$column->setTypeName(?);', [$doctrineType]);
+
+            foreach ($doctrineOptions as $option => $value) {
+                $method->addBody('$column->?(?);', [$option, $value]);
+            }
+
+            $method->addBody('$table->addColumn($column->create());');
+            $method->addBody('');
         }
 
-        $method->addBody('');
-        $method->addBody('$table->setPrimaryKey([?]);', [\array_key_first($columns)]);
+        $method->addBody(<<<'PHP'
+            $table->setPrimaryKeyConstraint(
+                Schema\PrimaryKeyConstraint::editor()
+                ->setUnquotedColumnNames(?)
+                ->create()
+            );
+            PHP
+            , [\array_key_first($columns)]);
 
         $method->addBody('');
-        $method->addBody('return $schema;');
+        $method->addBody('return $table->create();');
     }
 
     public function hash(): string
@@ -107,17 +120,17 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
         $options = [];
 
         if ($type instanceof Type\TypeWithDefaultValue) {
-            $options = [...$options, ...['default' => $type->value]];
+            $options = [...$options, ...['setDefaultValue' => $type->value]];
             $type = $type->inner;
         }
 
         if ($type instanceof Type\NullableType) {
-            $options = [...$options, ...['notnull' => false, 'default' => null]];
+            $options = [...$options, ...['setNotNull' => false, 'setDefaultValue' => null]];
             $type = $type->inner;
         }
 
         if ($type instanceof Type\OptionalType) {
-            $options = [...$options, ...['notnull' => false, 'default' => null]];
+            $options = [...$options, ...['setNotNull' => false, 'setDefaultValue' => null]];
             $type = $type->inner;
         }
 
@@ -126,12 +139,12 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
             Type\BooleanType::class => [new Literal('Types::BOOLEAN'), [...$options]],
             Type\ArrayType::class,
             Type\DictType::class,
-            Type\ShapeType::class => [new Literal('Types::JSON'), ['default' => '{}', ...$options]],
-            Type\ListType::class => [new Literal('Types::JSON'), ['default' => '[]', ...$options]],
+            Type\ShapeType::class => [new Literal('Types::JSONB'), ['setDefaultValue' => '{}', ...$options]],
+            Type\ListType::class => [new Literal('Types::JSONB'), ['setDefaultValue' => '[]', ...$options]],
             Type\IntegerType::class,
             Type\NaturalType::class,
             Type\PositiveIntegerType::class => [new Literal('Types::INTEGER'), [...$options]],
-            Type\InstanceOfType::class => [new Literal('Types::JSON'), [...$options]],
+            Type\InstanceOfType::class => [new Literal('Types::JSONB'), [...$options]],
             default => [new Literal('Types::STRING'), [...$options]],
         };
     }

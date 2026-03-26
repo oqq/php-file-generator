@@ -9,14 +9,17 @@ use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Type as NetteType;
 use Nette\PhpGenerator\Type as NettType;
 use Oqq\PhpFileGenerator\CreateFromSpecification\CreateMethodBody;
-use Oqq\PhpFileGenerator\Specification\PostProcessorSpecification;
+use Oqq\PhpFileGenerator\Specification\ClassPostProcessorSpecification;
 use Oqq\PhpFileGenerator\Type\ClassStringType;
 use Oqq\PhpFileGenerator\Type\TypeWithDefaultValue;
 use Oqq\PhpFileGenerator\Type\TypeWithFixedValue;
 
-final readonly class PostProcessor
+/**
+ * @implements PostProcessFromSpecification<ClassPostProcessorSpecification>
+ */
+final readonly class ClassPostProcessor implements PostProcessFromSpecification
 {
-    public function __invoke(ClassFile $classFile, PostProcessorSpecification $specification): void
+    public function __invoke(ClassFile $classFile, ClassPostProcessorSpecification $specification): void
     {
         $this->importTypes($classFile, $specification->classConstants);
         $this->processImports($classFile, $specification->implements);
@@ -94,7 +97,7 @@ final readonly class PostProcessor
             $typeHint = $type->getTypeHint();
             $constant->setType($typeHint);
 
-            $typeAnnotation = $type->getTypeAnnotation();
+            $typeAnnotation = $classFile->simplifyTypeAnnotation($type);
 
             if ($typeAnnotation && $typeAnnotation !== $typeHint) {
                 $constant->setComment('@var ' . $typeAnnotation);

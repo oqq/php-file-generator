@@ -20,7 +20,7 @@ final readonly class IterableType implements Type
      */
     public function __construct(
         public ?Type $keyType,
-        public Type $valueType,
+        public ?Type $valueType,
     ) {
     }
 
@@ -36,6 +36,10 @@ final readonly class IterableType implements Type
 
     public function getTypeAnnotation(): string
     {
+        if (null === $this->valueType) {
+            return 'iterable';
+        }
+
         if (null === $this->keyType) {
             return 'iterable<' . $this->valueType->getTypeAnnotation() . '>';
         }

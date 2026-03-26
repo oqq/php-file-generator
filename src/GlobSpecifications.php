@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Oqq\PhpFileGenerator;
 
-use Oqq\PhpFileGenerator\Specification\PostProcessorSpecification;
 use Traversable;
 
 final class GlobSpecifications implements Specifications
@@ -28,7 +27,7 @@ final class GlobSpecifications implements Specifications
             }
 
             if ($specifications->hasSpecificationFor($specification->className)) {
-                //throw new \RuntimeException(\sprintf('Duplicate specification for class "%s"', $specification->className));
+                throw new \RuntimeException(\sprintf('Duplicate specification for class "%s"', $specification->className));
             }
 
             $specifications->specifications[$specification->className] = $specification;
@@ -50,11 +49,17 @@ final class GlobSpecifications implements Specifications
         }
     }
 
+    /**
+     * @param class-string $className
+     */
     public function hasSpecificationFor(string $className): bool
     {
         return isset($this->specifications[$className]);
     }
 
+    /**
+     * @param class-string $className
+     */
     public function getSpecificationFor(string $className): Specification
     {
         return $this->specifications[$className] ?? throw new \RuntimeException('no such specification for ' . $className);
@@ -65,6 +70,9 @@ final class GlobSpecifications implements Specifications
         yield from $this->postProcessorSpecifications;
     }
 
+    /**
+     * @param class-string $className
+     */
     public function getPostProcessorSpecificationsFor(string $className): iterable
     {
         foreach ($this->postProcessorSpecifications as $specification) {
