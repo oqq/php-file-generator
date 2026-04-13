@@ -3,15 +3,15 @@
   "type": "library",
   "require": {
     "php": "~8.5",
-    "azjezz/psl": "^5.5 | ^4.2",
     "cuyz/valinor": "^2.3",
     "nette/php-generator": "^4.2",
-    "nikic/php-parser": "^5.7"
+    "nikic/php-parser": "^5.7",
+    "php-standard-library/php-standard-library": "^6.1"
   },
   "require-dev": {
-    "doctrine/dbal": "^4.4.2",
+    "doctrine/dbal": "^4.4.3",
     "doctrine/migrations": "^3.9.6",
-    "phpunit/phpunit": "^12.5.14"
+    "phpunit/phpunit": "^12.5.19"
   },
   "config": {
     "sort-packages": true,

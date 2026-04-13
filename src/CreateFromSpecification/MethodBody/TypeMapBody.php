@@ -107,8 +107,8 @@ final readonly class TypeMapBody implements CreateMethodBody
             Type\ArrayType::class => [],
             Type\BooleanType::class => 'f#boolean',
             Type\IntegerType::class,
-            Type\NaturalType::class,
-            Type\PositiveIntegerType::class => 'f#randomNumber',
+            Type\NaturalType::class => 'f#randomNumber',
+            Type\PositiveIntegerType::class => new Literal("fn() => ['f#numberBetween', 1, 100000]"),
             Type\UuidType::class => 'f#uuid',
             Type\DateTimeType::class => 'f#date,Y-m-d\TH:i:s.uP',
         };
