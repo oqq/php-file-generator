@@ -145,6 +145,7 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
             Type\NaturalType::class,
             Type\PositiveIntegerType::class => [new Literal('Types::INTEGER'), [...$options]],
             Type\InstanceOfType::class => [new Literal('Types::JSONB'), [...$options]],
+            Type\DateTimeType::class => [new Literal('Types::DATETIME_IMMUTABLE'), [...$options]],
             default => [new Literal('Types::STRING'), [...$options]],
         };
     }

@@ -64,6 +64,10 @@ final readonly class TypeMapBody implements CreateMethodBody
             $type = $type->inner;
         }
 
+        if ($type instanceof Type\UnionType) {
+            $type = $type->leftType;
+        }
+
         if ($type instanceof Type\DictType) {
             return [
                 $this->getTypeMap($type->keyType) =>
