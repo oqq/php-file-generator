@@ -11,7 +11,7 @@
   "require-dev": {
     "doctrine/dbal": "^4.4.3",
     "doctrine/migrations": "^3.9.6",
-    "phpunit/phpunit": "^12.5.19"
+    "phpunit/phpunit": "^13.1.5"
   },
   "config": {
     "sort-packages": true,
@@ -24,11 +24,11 @@
     "psr-4": {
       "Oqq\\Project\\": "result/",
       "Oqq\\PhpFileGenerator\\": "src/"
-    },
-    "autoload-dev": {
-      "psr-4": {
-        "Oqq\\PhpFileGenerator\\test\\": "tests/unit"
-      }
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Oqq\\PhpFileGenerator\\test\\": "tests/unit"
     }
   }
 }
