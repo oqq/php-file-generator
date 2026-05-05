@@ -31,10 +31,9 @@ final readonly class TypeMapBody implements CreateMethodBody
             throw new \RuntimeException('not sure how to handle specification');
         }
 
-        $type = $specification->type;
-        $result = $this->getTypeMap($type);
+        $result = $this->getTypeMap($specification->type, $specification->fakerType);
 
-        if (\is_string($result)) {
+        if (\is_string($result) || $result instanceof Literal) {
             $result = ['value' => $result];
         }
 
@@ -46,8 +45,12 @@ final readonly class TypeMapBody implements CreateMethodBody
         return $this->getSpecification($this->valueObject)->hash();
     }
 
-    private function getTypeMap(Type $type): array | string | Literal
+    private function getTypeMap(Type $type, ?string $fakerType = null): array | string | Literal
     {
+        if (null !== $fakerType) {
+            return $fakerType;
+        }
+
         if ($type instanceof Type\OptionalType) {
             $type = $type->inner;
         }
@@ -90,7 +93,7 @@ final readonly class TypeMapBody implements CreateMethodBody
             $specification = $this->getSpecification($type->className);
             
             if ($specification instanceof ValueObjectSpecification) {
-                return $this->getTypeMap($specification->type);
+                return $this->getTypeMap($specification->type, $specification->fakerType);
             }
 
             if ($specification instanceof EnumSpecification) {

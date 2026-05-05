@@ -95,6 +95,7 @@ final readonly class CreateValueObject implements CreateFromSpecification
         $method->addBody('$this->? = ?;', [$propertyName, $type->value]);
 
         $property = $class->addProperty($propertyName);
+        $property->setPublic();
         $property->setPrivate(PropertyAccessMode::Set);
 
         $innerType = $type->inner;

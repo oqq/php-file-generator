@@ -39,9 +39,9 @@ final readonly class SpecificationBuilder
      *
      * @return iterable<Specification<T>>
      */
-    public static function valueObject(string $className, Type $type): iterable
+    public static function valueObject(string $className, Type $type, ?string $fakerType = null): iterable
     {
-        yield new Specification\ValueObjectSpecification($className, $type);
+        yield new Specification\ValueObjectSpecification($className, $type, $fakerType);
     }
 
     /**

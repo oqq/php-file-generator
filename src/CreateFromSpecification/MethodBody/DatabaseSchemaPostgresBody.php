@@ -23,7 +23,7 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
 
     public function __invoke(Method $method): void
     {
-        $method->addBody('$table = Schema\Table::editor();');
+        $method->addBody('$table = Table::editor();');
         $method->addBody('$table->setUnquotedName(self::TABLE_NAME);');
         $method->addBody('');
 
@@ -45,8 +45,8 @@ final readonly class DatabaseSchemaPostgresBody implements CreateMethodBody
         $method->addBody(<<<'PHP'
             $table->setPrimaryKeyConstraint(
                 Schema\PrimaryKeyConstraint::editor()
-                ->setUnquotedColumnNames(?)
-                ->create()
+                    ->setUnquotedColumnNames(?)
+                    ->create(),
             );
             PHP
             , [\array_key_first($columns)]);

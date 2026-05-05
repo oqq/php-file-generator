@@ -18,6 +18,7 @@ final readonly class CreateEnum implements CreateFromSpecification
     public function __invoke(ClassFile $classFile, EnumSpecification $specification): void
     {
         $enum = $classFile->getEnum();
+        $enum->setComment('@generated');
         $enum->setType(NetteType::String);
         $enum->setCases([]);
 

@@ -17,6 +17,7 @@ final readonly class ValueObjectSpecification implements Specification
         /** @param class-string<T> $className */
         public string $className,
         public Type $type,
+        public ?string $fakerType = null,
     ) {
     }
 
